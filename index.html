@@ -16,10 +16,11 @@ button:active{transform:translateY(1px)}
 .card{background:#fff;border-radius:18px;padding:16px;margin-top:12px;box-shadow:0 2px 12px #0000000b}
 .card h2{font-size:15px;margin:0 0 12px;color:#666}
 .result{display:grid;grid-template-columns:44px 1fr;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid #eee}
-.result:last-child{border-bottom:0} .num{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:#eee;font-weight:700}
-.cat{font-size:11px;color:#888} .theme{font-size:18px;font-weight:700}
-.mythos{font-size:22px;font-weight:800} .dice{font-size:12px;color:#888;margin-top:3px}
-.hidden{display:none} .note{font-size:12px;color:#777;line-height:1.6;margin-top:12px}
+.result:last-child{border-bottom:0}.num{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:#eee;font-weight:700}
+.cat{font-size:11px;color:#888}.theme{font-size:18px;font-weight:700}
+.mythos{font-size:22px;font-weight:800}.dice{font-size:12px;color:#888;margin-top:3px}
+.mythDesc{font-size:14px;line-height:1.75;color:#555;margin-top:10px;white-space:pre-line}
+.hidden{display:none}.note{font-size:12px;color:#777;line-height:1.6;margin-top:12px}
 </style>
 </head>
 <body>
@@ -28,54 +29,13 @@ button:active{transform:translateY(1px)}
 <h1>TRPGシナリオジェネレーター</h1>
 <p>1d20 → 1d10 × 5 → 1d100。重複テーマは自動で振り直します。</p>
 </header>
-<button id="generate">シナリオを生成</button>
+<button id="generate">🎲 シナリオを生成</button>
 <button class="secondary" id="copy">結果をコピー</button>
 <section id="output" class="hidden">
 <div class="card"><h2>◆ 5つのテーマ</h2><div id="themes"></div></div>
-<div class="card"><h2>◆ 神話生物（1d100）</h2><div id="mythos" class="mythos"></div><div id="mythDice" class="dice"></div></div>
+<div class="card"><h2>◆ 神話生物（1d100）</h2><div id="mythos" class="mythos"></div><div id="mythDice" class="dice"></div><div id="mythDesc" class="mythDesc"></div></div>
 <div class="card"><h2>◆ シナリオの核</h2><div id="prompt"></div></div>
-<div class="note">※神話生物名はシナリオ作成用の候補リストです。版・サプリメントによって正式名称や扱いが異なる場合があります。</div>
+<div class="note">※神話生物名と解説はシナリオ作成用のオリジナル整理データです。版・サプリメントによって名称・設定・扱いが異なる場合があります。</div>
 </section>
 </main>
 <script>
-const categories = [{"name": "機械・乗り物", "items": ["自動車", "電車", "新幹線", "飛行機", "船", "バイク", "自転車", "ロボット", "掃除機", "洗濯機"]}, {"name": "感情・感覚", "items": ["喜び", "怒り", "悲しみ", "恐怖", "驚き", "嫉妬", "恥", "安心", "寂しさ", "懐かしさ"]}, {"name": "食べ物・飲み物", "items": ["寿司", "ラーメン", "カレー", "ハンバーグ", "うどん", "焼肉", "ピザ", "ケーキ", "アイスクリーム", "コーヒー"]}, {"name": "動物・生き物", "items": ["犬", "猫", "ライオン", "ゾウ", "キリン", "サル", "ウサギ", "ペンギン", "イルカ", "カブトムシ"]}, {"name": "植物・花", "items": ["桜", "ひまわり", "チューリップ", "バラ", "たんぽぽ", "朝顔", "梅", "松", "竹", "藤"]}, {"name": "自然・天候", "items": ["太陽", "月", "星", "雨", "雪", "雷", "台風", "虹", "火山", "滝"]}, {"name": "人・職業", "items": ["医者", "看護師", "教師", "警察官", "消防士", "料理人", "大工", "農家", "漁師", "パイロット"]}, {"name": "場所・建物", "items": ["学校", "病院", "駅", "城", "神社", "寺", "公園", "遊園地", "図書館", "コンビニ"]}, {"name": "道具・日用品", "items": ["時計", "傘", "鉛筆", "ハサミ", "鍋", "包丁", "眼鏡", "財布", "鞄", "スマートフォン"]}, {"name": "武器・防具", "items": ["刀", "槍", "弓", "鉄砲", "斧", "鎌", "手裏剣", "盾", "鎧", "兜"]}, {"name": "スポーツ・遊び", "items": ["野球", "サッカー", "バスケットボール", "テニス", "水泳", "卓球", "将棋", "囲碁", "鬼ごっこ", "かくれんぼ"]}, {"name": "音楽・楽器", "items": ["ピアノ", "ギター", "ドラム", "バイオリン", "トランペット", "フルート", "太鼓", "ハーモニカ", "オルガン", "三味線"]}, {"name": "物語・フィクション", "items": ["タイムトラベル", "異世界", "ループ", "入れ替わり", "記憶喪失", "復讐", "宝探し", "脱出", "秘密結社", "終末"]}, {"name": "服・装飾品", "items": ["シャツ", "ズボン", "スカート", "ワンピース", "制服", "着物", "帽子", "靴", "ネックレス", "指輪"]}, {"name": "国・地域・都市", "items": ["日本", "アメリカ", "中国", "韓国", "イギリス", "フランス", "イタリア", "東京", "京都", "北海道"]}, {"name": "歴史・文化", "items": ["戦国時代", "江戸時代", "武士", "茶道", "華道", "歌舞伎", "相撲", "能", "俳句", "浮世絵"]}, {"name": "神話・伝説・空想", "items": ["ドラゴン", "天使", "悪魔", "妖怪", "吸血鬼", "人魚", "ユニコーン", "フェニックス", "巨人", "魔法使い"]}, {"name": "色・形・模様", "items": ["赤", "青", "黄色", "緑", "紫", "三角形", "円", "星形", "水玉", "縞模様"]}, {"name": "言葉・概念", "items": ["愛", "友情", "夢", "希望", "自由", "平和", "正義", "勇気", "時間", "運命"]}, {"name": "怖いもの・不思議なもの", "items": ["お化け屋敷", "呪い", "心霊写真", "都市伝説", "未確認生物", "怪奇現象", "謎の人物", "無人の廃墟", "深夜の電話", "人形"]}];
-const mythos = ["アブホース", "アトラク＝ナクア", "アフォーゴモン", "アザトース", "アトラック＝ナチャ", "バイアティス", "ビヤーキー", "ボクラグ", "チャウグナー・フォーン", "チョ＝チョ人", "クトゥグア", "クトゥルフ", "ダゴン", "ディープ・ワン", "ガグ", "ガスト", "グール", "ハスター", "ハイドラ", "イゴーロナク", "イタカ", "ジャック・オー・ランタン", "ジッタ・ユグ", "カラカル", "クァチル・ウタウス", "キーパーズ・オブ・ザ・ゲート", "ゴル＝ゴロス", "ゴグ＝フール", "グラーキ", "グロス＝ゴルカ", "グルーン", "ハン", "ハン＝ティ", "イグ", "イタクァの眷属", "シャンタク鳥", "ショゴス", "ショゴス・ロード", "シュブ＝ニグラス", "シュド＝メル", "深きもの", "ズーグ", "ツァトゥグァ", "ティンダロスの猟犬", "トゥールスチャ", "トルネンブラ", "ナガァエ", "ニャルラトテップ", "ノーデンス", "ノフ＝ケー", "ハイパーボリアの吸血鬼", "バイアキー", "ミ＝ゴ", "ムーン＝ビースト", "ミイラ", "夜鬼", "ニグラトル", "ニトクリス", "オールド・ワンの落とし子", "パンの娘", "ピックマンのグール", "ラット・シング", "レンの人々", "ロイガー", "クトゥルフの星の落とし子", "ティンダロスの犬", "シェゴス", "シュブ＝ニグラスの黒い仔山羊", "ショゴスの幼生", "空飛ぶポリプ", "ユゴスの菌類", "星の精", "星の吸血鬼", "星の落とし子", "無貌の神", "這い寄る混沌", "黄色の印の従者", "黄衣の王", "炎の精", "水棲の異形", "地底のもの", "蛇人間", "ドール", "ドールの民", "ムーン・ビースト", "ガタノソア", "ゴルゴロス", "ツァール", "ロイガーとツァール", "ウボ＝サスラ", "ヴルトゥーム", "ヤディスの吸血鬼", "ゾスの落とし子", "ザイクロトルの怪物", "アザトースの眷属", "クトゥルフの眷属", "ニャルラトテップの化身", "ハスターの化身", "シュブ＝ニグラスの化身", "古のもの"];
-let lastText = "";
-
-function rand(max) {
-  const a = new Uint32Array(1);
-  crypto.getRandomValues(a);
-  return a[0] % max;
-}
-function generate() {
-  const chosen = [];
-  while (chosen.length < 5) {
-    const ci = rand(categories.length);
-    const ti = rand(categories[ci].items.length);
-    const item = categories[ci].items[ti];
-    if (chosen.some(x => x.item === item)) continue;
-    chosen.push({cat:categories[ci].name,item,d20:ci+1,d10:ti+1});
-  }
-  const m = rand(100);
-  document.getElementById("themes").innerHTML = chosen.map((x,i) =>
-    `<div class="result"><div class="num">${i+1}</div><div><div class="cat">1d20 = ${x.d20}　／　1d10 = ${x.d10}　${x.cat}</div><div class="theme">${x.item}</div></div></div>`
-  ).join("");
-  document.getElementById("mythos").textContent = mythos[m];
-  document.getElementById("mythDice").textContent = `1d100 = ${m+1}`;
-  const items = chosen.map(x=>x.item).join("、");
-  document.getElementById("prompt").textContent =
-    `「${items}」をすべて重要要素として登場させ、${mythos[m]}を脅威・事件の中心に据える。5つのテーマが偶然ではなく一つの事件につながるように構成する。`;
-  document.getElementById("output").classList.remove("hidden");
-  lastText = "【TRPGシナリオジェネレーター】\n" +
-    chosen.map((x,i)=>`${i+1}. ${x.item}（${x.cat} / 1d20=${x.d20}, 1d10=${x.d10}）`).join("\n") +
-    `\n神話生物：${mythos[m]}（1d100=${m+1}）`;
-}
-document.getElementById("generate").addEventListener("click", generate);
-document.getElementById("copy").addEventListener("click", async () => {
-  if (!lastText) return alert("先に「シナリオを生成」を押してください。");
-  try { await navigator.clipboard.writeText(lastText); alert("結果をコピーしました。"); }
-  catch(e) { alert(lastText); }
-});
-</script>
-</body>
-</html>
